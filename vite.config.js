@@ -2,6 +2,9 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
-  base: "/Ray-Hughes.github.io/",
+  base: "/ray-hughes.github.io/",
+  build: {
+    assetsDir: "assets",
+  },
   plugins: [react()],
 });
