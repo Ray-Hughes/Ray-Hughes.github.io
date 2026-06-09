@@ -251,8 +251,11 @@ function useReveal() {
    Nav
 ───────────────────────────────────────────────────────────────────── */
 
+const NAV_LINKS = [['About','about'],['Experience','experience'],['Projects','projects'],['Skills','skills'],['Contact','contact']];
+
 function Nav() {
   const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen]         = useState(false);
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 50);
@@ -260,59 +263,110 @@ function Nav() {
     return () => window.removeEventListener('scroll', fn);
   }, []);
 
+  useEffect(() => {
+    if (!open) return;
+    const fn = e => { if (!e.target.closest('.nav-root')) setOpen(false); };
+    document.addEventListener('mousedown', fn);
+    return () => document.removeEventListener('mousedown', fn);
+  }, [open]);
+
+  const scrollTo = id => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    setOpen(false);
+  };
+
+  const active = scrolled || open;
   const linkStyle = {
     fontFamily: 'var(--font-mono)', fontSize: '0.7rem',
     color: 'var(--text2)', letterSpacing: '0.12em', textTransform: 'uppercase',
-    transition: 'color 0.2s',
+    transition: 'color 0.2s', cursor: 'pointer', background: 'none', border: 'none',
   };
 
   return (
-    <nav style={{
-      position: 'fixed', top: 0, left: 0, right: 0, zIndex: 200, height: 64,
-      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: '0 clamp(1rem, 5vw, 3.5rem)',
-      background: scrolled ? 'rgba(2,12,27,0.94)' : 'transparent',
-      backdropFilter: scrolled ? 'blur(18px)' : 'none',
-      WebkitBackdropFilter: scrolled ? 'blur(18px)' : 'none',
-      borderBottom: scrolled ? '1px solid rgba(0,212,255,0.1)' : '1px solid transparent',
-      transition: 'background 0.35s, border-color 0.35s',
+    <div className="nav-root" style={{
+      position: 'fixed', top: 0, left: 0, right: 0, zIndex: 200,
+      background: active ? 'rgba(2,12,27,0.95)' : 'transparent',
+      backdropFilter: active ? 'blur(18px)' : 'none',
+      WebkitBackdropFilter: active ? 'blur(18px)' : 'none',
+      borderBottom: active ? '1px solid rgba(0,212,255,0.1)' : '1px solid transparent',
+      transition: 'background 0.3s, border-color 0.3s',
     }}>
-      <button
-        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        style={{
+      {/* Main bar */}
+      <div style={{
+        height: 64, display: 'flex', alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0 clamp(1rem, 5vw, 3.5rem)',
+      }}>
+        <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} style={{
           fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '1rem',
           color: '#00d4ff', letterSpacing: '0.1em', background: 'none',
-          border: 'none', cursor: 'pointer', padding: 0,
-        }}
-      >
-        RH<span style={{ color: 'rgba(0,212,255,0.35)' }}>.io</span>
-      </button>
+          border: 'none', cursor: 'pointer', padding: 0, flexShrink: 0,
+        }}>
+          RH<span style={{ color: 'rgba(0,212,255,0.35)' }}>.io</span>
+        </button>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(1.2rem, 2.5vw, 2.2rem)' }}>
-        {[['About','about'],['Experience','experience'],['Projects','projects'],['Skills','skills'],['Contact','contact']].map(([label, id]) => (
-          <a key={label} href={`#${id}`} className="nav-link" style={linkStyle}
-            onClick={e => { e.preventDefault(); document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }); }}
-            onMouseEnter={e => e.currentTarget.style.color = '#00d4ff'}
-            onMouseLeave={e => e.currentTarget.style.color = 'var(--text2)'}
-          >
-            {label}
-          </a>
-        ))}
-        <a
-          href="/resume.pdf" download
-          style={{
+        {/* Desktop links */}
+        <div className="nav-desktop">
+          {NAV_LINKS.map(([label, id]) => (
+            <button key={label} onClick={() => scrollTo(id)} style={linkStyle}
+              onMouseEnter={e => e.currentTarget.style.color = '#00d4ff'}
+              onMouseLeave={e => e.currentTarget.style.color = 'var(--text2)'}
+            >{label}</button>
+          ))}
+          <a href="/resume.pdf" download style={{
             fontFamily: 'var(--font-mono)', fontSize: '0.68rem', letterSpacing: '0.12em',
             textTransform: 'uppercase', padding: '0.45rem 1.1rem',
             border: '1px solid rgba(0,212,255,0.45)', color: '#00d4ff',
             borderRadius: 3, transition: 'all 0.22s', whiteSpace: 'nowrap',
           }}
-          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,212,255,0.1)'; e.currentTarget.style.boxShadow = '0 0 22px rgba(0,212,255,0.25)'; }}
-          onMouseLeave={e => { e.currentTarget.style.background = ''; e.currentTarget.style.boxShadow = ''; }}
-        >
-          Download CV
-        </a>
+          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,212,255,0.1)'; }}
+          onMouseLeave={e => { e.currentTarget.style.background = ''; }}
+          >Download CV</a>
+        </div>
+
+        {/* Mobile controls */}
+        <div className="nav-mobile">
+          <button onClick={() => setOpen(o => !o)} aria-label="Menu" style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            display: 'flex', flexDirection: 'column', gap: 5, padding: 4,
+          }}>
+            <span style={{ display:'block', width:22, height:2, background:'#00d4ff', transition:'all 0.25s',
+              transform: open ? 'translateY(7px) rotate(45deg)' : 'none' }} />
+            <span style={{ display:'block', width:22, height:2, background:'#00d4ff', transition:'all 0.25s',
+              opacity: open ? 0 : 1 }} />
+            <span style={{ display:'block', width:22, height:2, background:'#00d4ff', transition:'all 0.25s',
+              transform: open ? 'translateY(-7px) rotate(-45deg)' : 'none' }} />
+          </button>
+        </div>
       </div>
-    </nav>
+
+      {/* Mobile dropdown */}
+      <div className="nav-dropdown" style={{
+        maxHeight: open ? 400 : 0,
+        overflow: 'hidden',
+        transition: 'max-height 0.3s ease',
+        borderTop: open ? '1px solid rgba(0,212,255,0.1)' : 'none',
+      }}>
+        <div style={{ padding: '0.75rem clamp(1rem,5vw,3.5rem) 1.25rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+          {NAV_LINKS.map(([label, id]) => (
+            <button key={label} onClick={() => scrollTo(id)} style={{
+              fontFamily: 'var(--font-mono)', fontSize: '0.8rem', letterSpacing: '0.12em',
+              textTransform: 'uppercase', color: 'var(--text)', background: 'none',
+              border: 'none', cursor: 'pointer', padding: '0.6rem 0',
+              textAlign: 'left', borderBottom: '1px solid rgba(0,212,255,0.06)',
+            }}
+            onMouseEnter={e => e.currentTarget.style.color = '#00d4ff'}
+            onMouseLeave={e => e.currentTarget.style.color = 'var(--text)'}
+            >{label}</button>
+          ))}
+          <a href="/resume.pdf" download style={{
+            marginTop: '0.5rem', fontFamily: 'var(--font-mono)', fontSize: '0.78rem',
+            letterSpacing: '0.12em', textTransform: 'uppercase',
+            padding: '0.65rem 0', color: '#00d4ff', display: 'block',
+          }}>↓ Download Resume (PDF)</a>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -382,8 +436,8 @@ function Hero() {
         background: 'linear-gradient(to bottom, transparent, var(--bg))', pointerEvents: 'none',
       }} />
 
-      {/* Content */}
-      <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', padding: '0 clamp(1rem, 5vw, 2rem)', maxWidth: 860 }}>
+      {/* Content — extra top padding ensures clearance of fixed 64px nav */}
+      <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', padding: 'clamp(5rem, 10vw, 2rem) clamp(1rem, 5vw, 2rem) 0', maxWidth: 860 }}>
         {/* System badge */}
         <div style={{
           fontFamily: 'var(--font-mono)', fontSize: '0.6rem', color: 'rgba(0,212,255,0.45)',

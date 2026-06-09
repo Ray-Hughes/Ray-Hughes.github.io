@@ -2,6 +2,17 @@ import React, { useEffect, useLayoutEffect, useRef, useState, useCallback } from
 import { useParams, Link } from 'react-router-dom';
 import { PROJECTS_MAP } from '../data/projectsData';
 
+/* ── useIsMobile ──────────────────────────────────────────────────── */
+function useIsMobile(bp = 768) {
+  const [mobile, setMobile] = useState(() => window.innerWidth < bp);
+  useEffect(() => {
+    const fn = () => setMobile(window.innerWidth < bp);
+    window.addEventListener('resize', fn, { passive: true });
+    return () => window.removeEventListener('resize', fn);
+  }, [bp]);
+  return mobile;
+}
+
 /* ── helpers ──────────────────────────────────────────────────────── */
 
 const C = {
@@ -25,23 +36,67 @@ function useRevealRefs() {
   return revealRef;
 }
 
-/* ── Syntax highlighter (minimal, inline) ─────────────────────────── */
-function highlight(code, color) {
-  const keywords = /\b(class|module|def|end|do|return|if|unless|rescue|raise|then|else|begin|self|true|false|nil|require|include|attr_reader|enum|validates|belongs_to|has_many|through|before_action|render|redirect_to|namespace|resources|get|post|let|import|export|const|async|await|function|from|new|this|private)\b/g;
-  const strings  = /(['"`])(?:(?!\1)[^\\]|\\.)*?\1/g;
-  const comments = /#.*/g;
-  const numbers  = /\b\d+(\.\d+)?\b/g;
-  const methods  = /(\w+)(?=\()/g;
-  const symbols  = /:\w+/g;
+/* ── Syntax highlighter — single-pass tokenizer, no re-processing ──── */
+function highlight(code, kwColor) {
+  const KW = new Set([
+    'class','module','def','end','do','return','if','unless','rescue','raise',
+    'then','else','begin','self','true','false','nil','require','include',
+    'attr_reader','enum','validates','belongs_to','has_many','through',
+    'before_action','render','redirect_to','namespace','resources','get','post',
+    'let','import','export','const','async','await','function','from','new',
+    'this','private','super','yield','when','case','of','var','type',
+    'interface','extends','default','static','readonly','protected',
+  ]);
+  const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const span = (s, c, bold) =>
+    `<span style="color:${c}${bold?';font-weight:600':''}">${esc(s)}</span>`;
 
-  return code
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(comments,  m => `<span style="color:#4a6080;font-style:italic">${m}</span>`)
-    .replace(strings,   m => `<span style="color:#98d982">${m}</span>`)
-    .replace(keywords,  m => `<span style="color:${color};font-weight:600">${m}</span>`)
-    .replace(symbols,   m => `<span style="color:#e5c07b">${m}</span>`)
-    .replace(methods,   m => `<span style="color:#61afef">${m}</span>`)
-    .replace(numbers,   m => `<span style="color:#d19a66">${m}</span>`);
+  const out = [];
+  let i = 0;
+
+  while (i < code.length) {
+    // Line comment (#)
+    if (code[i] === '#') {
+      let j = i;
+      while (j < code.length && code[j] !== '\n') j++;
+      out.push(span(code.slice(i, j), '#4a6080') + (code[j] === '\n' ? '\n' : ''));
+      i = j + (code[j] === '\n' ? 1 : 0);
+      continue;
+    }
+    // String literal
+    if (code[i] === '"' || code[i] === "'" || code[i] === '`') {
+      const q = code[i]; let j = i + 1;
+      while (j < code.length && code[j] !== q) { if (code[j] === '\\') j++; j++; }
+      out.push(span(code.slice(i, j + 1), '#98d982'));
+      i = j + 1; continue;
+    }
+    // Symbol :ident
+    if (code[i] === ':' && i + 1 < code.length && /[a-zA-Z_]/.test(code[i + 1])) {
+      let j = i + 1;
+      while (j < code.length && /\w/.test(code[j])) j++;
+      out.push(span(code.slice(i, j), '#e5c07b'));
+      i = j; continue;
+    }
+    // Number
+    if (/\d/.test(code[i]) && (i === 0 || !/\w/.test(code[i - 1]))) {
+      let j = i;
+      while (j < code.length && /[\d.xXa-fA-F_]/.test(code[j])) j++;
+      out.push(span(code.slice(i, j), '#d19a66'));
+      i = j; continue;
+    }
+    // Word: keyword | method call | identifier
+    if (/[a-zA-Z_]/.test(code[i])) {
+      let j = i;
+      while (j < code.length && /\w/.test(code[j])) j++;
+      const word = code.slice(i, j);
+      if (KW.has(word)) out.push(span(word, kwColor, true));
+      else if (code[j] === '(') out.push(span(word, '#61afef'));
+      else out.push(esc(word));
+      i = j; continue;
+    }
+    out.push(esc(code[i])); i++;
+  }
+  return out.join('');
 }
 
 /* ── 3D Dice ──────────────────────────────────────────────────────── */
@@ -483,6 +538,7 @@ function CodeBlock({ code, filename, color }) {
 
 /* ── Milestone Card ───────────────────────────────────────────────── */
 function Milestone({ milestone, index, color, isLeft, revealRef }) {
+  const isMobile = useIsMobile();
   const visual = milestone.screenshot
     ? <img src={milestone.screenshot} alt={milestone.screenshotAlt}
         style={{ width:'100%', borderRadius:8, border:`1px solid ${color}28`, display:'block', boxShadow:`0 0 40px ${color}18` }} />
@@ -532,7 +588,7 @@ function Milestone({ milestone, index, color, isLeft, revealRef }) {
         userSelect:'none', zIndex:0,
       }}>{milestone.number}</div>
 
-      <div style={{ position:'relative', zIndex:1, display:'grid', gridTemplateColumns:'1fr 1fr', gap:'clamp(1.5rem,4vw,3rem)', alignItems:'start' }}>
+      <div style={{ position:'relative', zIndex:1, display:'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap:'clamp(1.5rem,4vw,3rem)', alignItems:'start' }}>
         {left}
         {right}
       </div>
@@ -594,6 +650,7 @@ export default function ProjectPage() {
   const { slug }             = useParams();
   const project              = PROJECTS_MAP[slug];
   const revealRef            = useRevealRefs();
+  const isMobile             = useIsMobile();
   const [activeMilestone, setActiveMilestone] = useState(0);
   const milestoneRefs        = useRef([]);
 
@@ -685,7 +742,7 @@ export default function ProjectPage() {
         paddingBottom:'clamp(3rem,8vw,6rem)',
         padding:'clamp(5rem,12vw,9rem) clamp(1rem,6vw,5rem) clamp(3rem,6vw,5rem)',
         maxWidth:1100, margin:'0 auto',
-        display:'grid', gridTemplateColumns:'1fr 1fr', gap:'clamp(2rem,5vw,4rem)', alignItems:'center',
+        display:'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap:'clamp(2rem,5vw,4rem)', alignItems:'center',
       }}>
         {/* Left: title + repos */}
         <div>
@@ -823,7 +880,7 @@ export default function ProjectPage() {
         </div>
       </div>
 
-      <ProgressTracker milestones={project.milestones} activeIdx={activeMilestone} color={color} />
+      {!isMobile && <ProgressTracker milestones={project.milestones} activeIdx={activeMilestone} color={color} />}
     </div>
   );
 }

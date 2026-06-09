@@ -85,12 +85,16 @@ button { font-family: inherit; }
   50%       { border-color: rgba(0, 212, 255, 0.45); }
 }
 
-/* ── Nav links — hide on small screens ─────────────────────────────── */
+/* ── Nav responsive ─────────────────────────────────────────────────── */
 
-.nav-link { display: block; }
+.nav-desktop  { display: flex; align-items: center; gap: clamp(1rem, 2vw, 2rem); }
+.nav-mobile   { display: none; }
+.nav-dropdown { display: none; }
 
-@media (max-width: 640px) {
-  .nav-link { display: none !important; }
+@media (max-width: 768px) {
+  .nav-desktop  { display: none !important; }
+  .nav-mobile   { display: flex; align-items: center; }
+  .nav-dropdown { display: block; }
 }
 
 /* ── Scroll-reveal ──────────────────────────────────────────────────── */
