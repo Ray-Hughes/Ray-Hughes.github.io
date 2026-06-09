@@ -289,8 +289,9 @@ function Nav() {
       </button>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(1.2rem, 2.5vw, 2.2rem)' }}>
-        {[['About','#about'],['Experience','#experience'],['Projects','#projects'],['Skills','#skills'],['Contact','#contact']].map(([label, href]) => (
-          <a key={label} href={href} className="nav-link" style={linkStyle}
+        {[['About','about'],['Experience','experience'],['Projects','projects'],['Skills','skills'],['Contact','contact']].map(([label, id]) => (
+          <a key={label} href={`#${id}`} className="nav-link" style={linkStyle}
+            onClick={e => { e.preventDefault(); document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }); }}
             onMouseEnter={e => e.currentTarget.style.color = '#00d4ff'}
             onMouseLeave={e => e.currentTarget.style.color = 'var(--text2)'}
           >
@@ -434,6 +435,7 @@ function Hero() {
           animation: 'fadeInUp 0.7s 0.4s ease both',
         }}>
           <a href="#about" style={btnPrimary}
+            onClick={e => { e.preventDefault(); document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' }); }}
             onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 0 50px rgba(0,212,255,0.55)'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
             onMouseLeave={e => { e.currentTarget.style.boxShadow = '0 0 32px rgba(0,212,255,0.35)'; e.currentTarget.style.transform = ''; }}
           >
