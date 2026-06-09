@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { PROJECTS_MAP } from '../data/projectsData';
 
@@ -597,7 +597,7 @@ export default function ProjectPage() {
   const [activeMilestone, setActiveMilestone] = useState(0);
   const milestoneRefs        = useRef([]);
 
-  useEffect(() => { window.scrollTo(0, 0); }, [slug]);
+  useLayoutEffect(() => { window.scrollTo(0, 0); }, [slug]);
 
   // Inject CSS for reveal animations
   useEffect(() => {
