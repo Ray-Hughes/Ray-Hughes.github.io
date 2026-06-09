@@ -597,7 +597,11 @@ export default function ProjectPage() {
   const [activeMilestone, setActiveMilestone] = useState(0);
   const milestoneRefs        = useRef([]);
 
-  useLayoutEffect(() => { window.scrollTo(0, 0); }, [slug]);
+  useLayoutEffect(() => {
+    document.documentElement.style.scrollBehavior = 'auto';
+    window.scrollTo(0, 0);
+    document.documentElement.style.scrollBehavior = '';
+  }, [slug]);
 
   // Inject CSS for reveal animations
   useEffect(() => {
