@@ -1,6 +1,6 @@
 # Ray-Hughes.github.io
 
-Personal portfolio and resume site for **Raymond Hughes** — AI Engineer, Solutions Architect, and Ruby on Rails Tech Lead.
+Personal portfolio and resume site for **Raymond Hughes** - AI Engineer, Solutions Architect, and Ruby on Rails Tech Lead.
 
 **Live:** [ray-hughes.github.io](https://ray-hughes.github.io)
 
@@ -23,8 +23,8 @@ An interactive AI-themed portfolio showcasing professional experience, skills, a
 ## Stack
 
 - **React 19** + **Vite 6**
-- Custom CSS — Orbitron / Syne / JetBrains Mono font stack
-- Canvas API — animated neural network background
+- Custom CSS - Orbitron / Syne / JetBrains Mono font stack
+- Canvas API - animated neural network background
 - GitHub Actions — automated build and deploy on push to `main`
 
 ---
