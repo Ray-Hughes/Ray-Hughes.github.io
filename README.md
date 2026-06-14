@@ -25,7 +25,7 @@ An interactive AI-themed portfolio showcasing professional experience, skills, a
 - **React 19** + **Vite 6**
 - Custom CSS - Orbitron / Syne / JetBrains Mono font stack
 - Canvas API - animated neural network background
-- GitHub Actions — automated build and deploy on push to `main`
+- GitHub Actions - automated build and deploy on push to `main`
 
 ---
 
