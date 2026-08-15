@@ -206,6 +206,18 @@ function CareerGraph({ onPick }) {
       t += 0.006;
       ctx.clearRect(0, 0, W, H);
 
+      // Exactly one project node may be magnetic at a time, and it is the nearest.
+      // Attracting all three meant two of them trailed the pointer at once and
+      // the graph looked like it was falling apart.
+      let magnet = null;
+      if (pointer.x > -500) {
+        for (const n of nodes) {
+          if (!n.project) continue;
+          const d = Math.hypot(n.x - pointer.x, n.y - pointer.y);
+          if (d < 190 && (!magnet || d < magnet.d)) magnet = { node: n, d };
+        }
+      }
+
       // Drift, then push away from the pointer. The push is what makes it feel
       // like a thing rather than a video.
       let hover = null;
@@ -219,14 +231,16 @@ function CareerGraph({ onPick }) {
 
         // The scatter is the fun part, but applied to everything it made the
         // project nodes impossible to click: they fled the cursor faster than it
-        // could arrive. So the three that do something are magnetic instead. They
-        // come to the pointer and hold still under it, which also says which
-        // nodes are worth reaching for.
+        // could arrive. So the nearest one is magnetic instead, and the others
+        // stay where they are.
         if (n.project) {
-          if (d < 170 && d > 4) {
-            const pull = (1 - d / 170) ** 2 * 0.9;
+          if (magnet && magnet.node === n && d > 3) {
+            const pull = (1 - d / 190) ** 2 * 0.55;
             n.vx -= (dx / d) * pull;
             n.vy -= (dy / d) * pull;
+            // Braked hard once it arrives, so it parks under the pointer rather
+            // than orbiting it.
+            if (d < 34) { n.vx *= 0.55; n.vy *= 0.55; }
           }
         } else if (d < 150) {
           const force = (1 - d / 150) ** 2 * 1.6;
@@ -295,12 +309,26 @@ function CareerGraph({ onPick }) {
           ctx.globalAlpha = 1;
         }
 
-        // Labels only where they earn their place: the big three, the anchors,
-        // and whatever is under the pointer.
-        if (n.project || active || (n.hero && !stateRef.current.hover)) {
-          ctx.font = `${n.project ? 600 : 500} ${n.project ? 13 : 11.5}px Manrope, system-ui, sans-serif`;
-          ctx.fillStyle = active || n.project ? '#edeff6' : 'rgba(237,239,246,0.62)';
+        // Labels where they earn their place. Holding a node names everything it
+        // connects to, which is the point of a graph: hiding those was answering
+        // "what is this connected to" with a picture of lines.
+        if (n.project || active || near || (n.hero && !stateRef.current.hover)) {
+          const strong = active || n.project || near;
+          ctx.font = `${strong ? 600 : 500} ${n.project ? 13 : near ? 12 : 11.5}px Manrope, system-ui, sans-serif`;
+          ctx.fillStyle = active ? '#ffffff'
+            : near ? 'rgba(237,239,246,0.94)'
+            : n.project ? '#edeff6'
+            : 'rgba(237,239,246,0.62)';
           ctx.textAlign = 'center';
+
+          // A dark plate behind a highlighted label, or it lands on top of an edge
+          // and neither is readable.
+          if (strong && (active || near)) {
+            const w = ctx.measureText(n.label).width;
+            ctx.fillStyle = 'rgba(7,7,14,0.72)';
+            ctx.fillRect(n.x - w / 2 - 5, n.y - n.r - 22, w + 10, 16);
+            ctx.fillStyle = active ? '#ffffff' : 'rgba(237,239,246,0.94)';
+          }
           ctx.fillText(n.label, n.x, n.y - n.r - 11);
         }
       }
@@ -433,6 +461,14 @@ function Nav() {
               onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--fg-2)'; e.currentTarget.style.background = 'none'; }}
             >{label}</button>
           ))}
+          <Link to="/fde" style={{
+            padding: '0.5rem 0.85rem', borderRadius: 9,
+            fontSize: '0.92rem', fontWeight: 700, color: 'var(--cy)',
+            transition: 'background 0.2s',
+          }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(110,231,255,0.1)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; }}
+          >FDE</Link>
           <a className="btn btn-ghost" href="/resume.pdf" download style={{ marginLeft: '0.5rem', padding: '0.6rem 1.1rem', fontSize: '0.88rem' }}>
             Resume
           </a>
@@ -495,16 +531,23 @@ function Hero() {
           alignItems: 'center',
         }} className="hero-grid">
           <div>
-            <div style={{
+            {/* The first thing anyone reads says what I am looking for, and it is
+                a door rather than a status line. */}
+            <Link to="/fde" style={{
               display: 'inline-flex', alignItems: 'center', gap: '0.55rem',
-              padding: '0.4rem 0.9rem', borderRadius: 99,
+              padding: '0.4rem 0.9rem 0.4rem 0.8rem', borderRadius: 99,
               border: '1px solid var(--line-hi)', background: 'rgba(255,255,255,0.03)',
               fontSize: '0.8rem', fontWeight: 600, color: 'var(--fg-2)',
               marginBottom: '1.6rem', animation: 'floatIn 0.6s ease both',
-            }}>
+              transition: 'color 0.2s, border-color 0.2s, background 0.2s',
+            }}
+              onMouseEnter={(e) => { e.currentTarget.style.color = 'var(--fg)'; e.currentTarget.style.borderColor = 'var(--cy)'; e.currentTarget.style.background = 'rgba(110,231,255,0.08)'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--fg-2)'; e.currentTarget.style.borderColor = 'var(--line-hi)'; e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; }}
+            >
               <span className="dot-live" style={{ width: 7, height: 7, borderRadius: 99, background: 'var(--cy)' }} />
-              Available for AI engineering work
-            </div>
+              Looking for Forward Deployed Engineer roles
+              <span style={{ color: 'var(--cy)' }}>→</span>
+            </Link>
 
             <h1 className="display" style={{ fontSize: 'clamp(2.2rem, 4.8vw, 3.35rem)', animation: 'floatIn 0.7s 0.05s ease both' }}>
               I build systems<br />that <span className="gradient-text">think with you</span>
@@ -671,8 +714,37 @@ function Work() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 420px), 1fr))', gap: '1.5rem' }}>
           {PROJECTS.map((p) => <ProjectCard key={p.slug} p={p} />)}
         </div>
+        <FdeBand />
       </div>
     </section>
+  );
+}
+
+/** The through line between the work above and the job I am after. */
+function FdeBand() {
+  return (
+    <Link to="/fde" className="reveal panel spot" onMouseMove={spotlight}
+      style={{ display: 'block', marginTop: '1.5rem', padding: 'clamp(1.5rem, 4vw, 2.25rem)' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', gap: '1.5rem', alignItems: 'center' }} className="feature-grid">
+        <div>
+          <div className="eyebrow" style={{ color: 'var(--cy)', marginBottom: '0.6rem' }}>What I am looking for next</div>
+          <h3 style={{ fontSize: 'clamp(1.3rem, 2.8vw, 1.75rem)', marginBottom: '0.7rem' }}>
+            Forward Deployed Engineer
+          </h3>
+          <p style={{ color: 'var(--fg-2)', maxWidth: '62ch', marginBottom: '1rem' }}>
+            Three years embedded in a customer’s estate through Take2 and Booz Allen Hamilton,
+            two regulated domains learned properly, and tooling left behind that their own
+            engineers use. That is the job, under a different title.
+          </p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
+            {['Embedded delivery', 'Domain immersion', 'Ambiguous problems', 'Ships and finishes'].map((c) => (
+              <span key={c} className="chip">{c}</span>
+            ))}
+          </div>
+        </div>
+        <span className="btn btn-primary" style={{ pointerEvents: 'none' }}>Read the case →</span>
+      </div>
+    </Link>
   );
 }
 
