@@ -16,12 +16,12 @@ function useIsMobile(bp = 768) {
 /* ── helpers ──────────────────────────────────────────────────────── */
 
 const C = {
-  bg:    '#020c1b',
-  bg2:   '#071222',
-  card:  'rgba(11,26,46,0.9)',
-  text:  '#ccd6f6',
-  text2: '#8892b0',
-  text3: '#4a5874',
+  bg:    '#07070e',
+  bg2:   '#0c0d17',
+  card:  'rgba(18,19,31,0.9)',
+  text:  '#edeff6',
+  text2: '#a3aabd',
+  text3: '#6b7286',
 };
 
 function useRevealRefs() {
@@ -145,7 +145,7 @@ function Dice({ facts, color }) {
 
   return (
     <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:'1.5rem', padding:'2rem', background: C.card, border:`1px solid ${color}22`, borderRadius:12 }}>
-      <div style={{ fontFamily:'var(--font-mono)', fontSize:'0.65rem', color:`${color}99`, letterSpacing:'0.25em', textTransform:'uppercase' }}>
+      <div style={{ fontFamily:'var(--font)', fontSize:'0.76rem', color:`${color}99`, letterSpacing:'0.25em', textTransform:'uppercase' }}>
         // roll for a tech fact
       </div>
 
@@ -166,7 +166,7 @@ function Dice({ facts, color }) {
       </div>
 
       <button onClick={roll} disabled={rolling} style={{
-        fontFamily:'var(--font-mono)', fontSize:'0.68rem', letterSpacing:'0.15em',
+        fontFamily:'var(--font)', fontSize:'0.8rem', letterSpacing:'0.15em',
         textTransform:'uppercase', padding:'0.5rem 1.5rem',
         background: rolling ? `${color}22` : `${color}18`,
         border:`1px solid ${color}44`, color,
@@ -178,17 +178,19 @@ function Dice({ facts, color }) {
 
       <div style={{
         maxWidth:380, textAlign:'center',
-        fontFamily:'var(--font-mono)', fontSize:'0.78rem',
+        fontFamily:'var(--font)', fontSize:'0.9rem',
         color: shown ? C.text : 'transparent',
-        lineHeight:1.7, transition:'color 0.5s ease',
+        lineHeight:1.7,
         minHeight:'3em',
         padding:'0.75rem 1rem',
         background: shown ? `${color}08` : 'transparent',
         border: shown ? `1px solid ${color}22` : '1px solid transparent',
         borderRadius:6,
-        transition:'all 0.4s ease',
+        // One declaration, naming what moves. There were two here and the second
+        // silently replaced the first, so the slower colour fade never ran.
+        transition:'color 0.5s ease, background 0.4s ease, border-color 0.4s ease',
       }}>
-        {shown && <span style={{color}}>//&nbsp;</span>}
+        {shown && <span style={{color}}></span>}
         {shown ? fact : 'Click Roll to reveal a tech fact'}
       </div>
     </div>
@@ -303,12 +305,12 @@ function AiChatSim({ color }) {
     <div style={{ background: C.bg2, border:`1px solid ${color}33`, borderRadius:10, overflow:'hidden', maxWidth:600 }}>
       <div style={{ padding:'0.75rem 1rem', borderBottom:`1px solid ${color}22`, display:'flex', alignItems:'center', gap:'0.5rem' }}>
         <div style={{ width:8, height:8, borderRadius:'50%', background:color, boxShadow:`0 0 8px ${color}` }} />
-        <span style={{ fontFamily:'var(--font-mono)', fontSize:'0.65rem', color:`${color}aa`, letterSpacing:'0.15em' }}>EPICEVITY SPEC ASSISTANT v1.0</span>
+        <span style={{ fontFamily:'var(--font)', fontSize:'0.76rem', color:`${color}aa`, letterSpacing:'0.15em' }}>EPICEVITY SPEC ASSISTANT v1.0</span>
       </div>
       <div ref={scrollRef} style={{ height:260, overflowY:'auto', padding:'1rem', display:'flex', flexDirection:'column', gap:'0.75rem' }}>
         {messages.map((msg, i) => (
           <div key={i} style={{
-            fontFamily:'var(--font-mono)', fontSize:'0.72rem', lineHeight:1.7,
+            fontFamily:'var(--font)', fontSize:'0.85rem', lineHeight:1.7,
             color: msg.role==='assistant' ? C.text : msg.role==='user' ? color : C.text3,
             padding: msg.role!=='system' ? '0.5rem 0.75rem' : 0,
             background: msg.role==='assistant' ? `${color}08` : msg.role==='user' ? `${color}12` : 'transparent',
@@ -332,12 +334,12 @@ function AiChatSim({ color }) {
           placeholder="Describe a feature to spec out..."
           style={{
             flex:1, background:'transparent', border:'none', outline:'none',
-            fontFamily:'var(--font-mono)', fontSize:'0.72rem', color:C.text,
+            fontFamily:'var(--font)', fontSize:'0.85rem', color:C.text,
             padding:'0.75rem 1rem',
           }}
         />
         <button onClick={send} disabled={typing} style={{
-          fontFamily:'var(--font-mono)', fontSize:'0.65rem', letterSpacing:'0.1em',
+          fontFamily:'var(--font)', fontSize:'0.76rem', letterSpacing:'0.1em',
           padding:'0 1.25rem', background: typing ? `${color}18` : `${color}25`,
           border:'none', color, cursor: typing ? 'wait' : 'pointer',
           borderLeft:`1px solid ${color}22`,
@@ -381,15 +383,15 @@ function CacheSim({ color }) {
     <div style={{ background: C.bg2, border:`1px solid ${color}33`, borderRadius:10, overflow:'hidden', maxWidth:600 }}>
       <div style={{ padding:'0.75rem 1rem', borderBottom:`1px solid ${color}22`, display:'flex', alignItems:'center', gap:'0.5rem' }}>
         <div style={{ width:8, height:8, borderRadius:'50%', background:color, boxShadow:`0 0 8px ${color}` }} />
-        <span style={{ fontFamily:'var(--font-mono)', fontSize:'0.65rem', color:`${color}aa`, letterSpacing:'0.15em' }}>SCEDGE EDGE CACHE — LIVE SIMULATOR</span>
+        <span style={{ fontFamily:'var(--font)', fontSize:'0.76rem', color:`${color}aa`, letterSpacing:'0.15em' }}>SCEDGE EDGE CACHE — LIVE SIMULATOR</span>
       </div>
 
       <div style={{ padding:'1rem', display:'flex', flexDirection:'column', gap:'0.75rem' }}>
-        <div style={{ fontFamily:'var(--font-mono)', fontSize:'0.65rem', color:C.text3 }}>
+        <div style={{ fontFamily:'var(--font)', fontSize:'0.76rem', color:C.text3 }}>
           Try a key:&nbsp;
           {exampleKeys.map(k => (
             <button key={k} onClick={() => setKey(k)} style={{
-              fontFamily:'var(--font-mono)', fontSize:'0.6rem', color, background:`${color}12`,
+              fontFamily:'var(--font)', fontSize:'0.72rem', color, background:`${color}12`,
               border:`1px solid ${color}33`, borderRadius:4, padding:'0.1rem 0.4rem',
               cursor:'pointer', marginRight:'0.4rem', marginBottom:'0.25rem',
             }}>{k}</button>
@@ -401,12 +403,12 @@ function CacheSim({ color }) {
             placeholder="Enter cache key..."
             style={{
               flex:1, background:`${color}08`, border:`1px solid ${color}33`, borderRadius:4,
-              fontFamily:'var(--font-mono)', fontSize:'0.72rem', color:C.text,
+              fontFamily:'var(--font)', fontSize:'0.85rem', color:C.text,
               padding:'0.5rem 0.75rem', outline:'none',
             }}
           />
           <button onClick={lookup} disabled={loading} style={{
-            fontFamily:'var(--font-mono)', fontSize:'0.68rem', letterSpacing:'0.12em',
+            fontFamily:'var(--font)', fontSize:'0.8rem', letterSpacing:'0.12em',
             padding:'0.5rem 1rem', background:`${color}22`, border:`1px solid ${color}44`,
             color, borderRadius:4, cursor: loading ? 'wait' : 'pointer',
           }}>
@@ -420,7 +422,7 @@ function CacheSim({ color }) {
             background: status==='HIT' ? 'rgba(0,255,136,0.06)' : 'rgba(255,100,100,0.06)',
             border:`1px solid ${status==='HIT' ? '#00ff8844' : '#ff666644'}`,
           }}>
-            <div style={{ fontFamily:'var(--font-mono)', fontSize:'0.65rem', letterSpacing:'0.2em', color: status==='HIT' ? '#00ff88' : '#ff6666', marginBottom:'0.5rem' }}>
+            <div style={{ fontFamily:'var(--font)', fontSize:'0.76rem', letterSpacing:'0.2em', color: status==='HIT' ? '#00ff88' : '#ff6666', marginBottom:'0.5rem' }}>
               CACHE {status} — {status==='HIT' ? '~2ms' : '404: key not found'}
             </div>
             {result && (
@@ -492,14 +494,14 @@ function DeploySim({ color }) {
       </div>
       <div style={{ padding:'0.75rem 1rem', borderTop:`1px solid ${color}22` }}>
         <button onClick={run} disabled={running} style={{
-          fontFamily:'var(--font-mono)', fontSize:'0.68rem', letterSpacing:'0.12em',
+          fontFamily:'var(--font)', fontSize:'0.8rem', letterSpacing:'0.12em',
           padding:'0.5rem 1.5rem', background: done ? `${color}22` : `${color}18`,
           border:`1px solid ${color}44`, color, borderRadius:4,
           cursor: running ? 'wait' : 'pointer', transition:'all 0.2s',
         }}>
           {running ? 'Deploying...' : done ? '✓ Run Again' : '🚀 Deploy to Production'}
         </button>
-        {done && <span style={{ fontFamily:'var(--font-mono)', fontSize:'0.65rem', color:'#00ff88', marginLeft:'1rem' }}>All systems go ✓</span>}
+        {done && <span style={{ fontFamily:'var(--font)', fontSize:'0.76rem', color:'#00ff88', marginLeft:'1rem' }}>All systems go ✓</span>}
       </div>
     </div>
   );
@@ -547,23 +549,23 @@ function Milestone({ milestone, index, color, isLeft, revealRef }) {
   const desc = (
     <div style={{ display:'flex', flexDirection:'column', gap:'1rem' }}>
       <div>
-        <div style={{ fontFamily:'var(--font-mono)', fontSize:'0.58rem', color:`${color}88`, letterSpacing:'0.25em', textTransform:'uppercase', marginBottom:'0.4rem' }}>
+        <div style={{ fontFamily:'var(--font)', fontSize:'0.7rem', color:`${color}88`, letterSpacing:'0.25em', textTransform:'uppercase', marginBottom:'0.4rem' }}>
           {milestone.phase}
         </div>
         <h3 style={{ fontFamily:'var(--font-heading)', fontSize:'clamp(1.1rem,2.5vw,1.4rem)', fontWeight:800, color:'#fff', lineHeight:1.2 }}>
           {milestone.title}
         </h3>
-        <div style={{ fontFamily:'var(--font-mono)', fontSize:'0.72rem', color:color, marginTop:'0.3rem' }}>
+        <div style={{ fontFamily:'var(--font)', fontSize:'0.85rem', color:color, marginTop:'0.3rem' }}>
           {milestone.subtitle}
         </div>
       </div>
-      <p style={{ fontFamily:'var(--font-mono)', fontSize:'0.78rem', color:C.text2, lineHeight:1.8 }}>
+      <p style={{ fontFamily:'var(--font)', fontSize:'0.9rem', color:C.text2, lineHeight:1.8 }}>
         {milestone.description}
       </p>
       <div style={{ display:'flex', flexWrap:'wrap', gap:'0.35rem' }}>
         {milestone.tags.map(t => (
           <span key={t} style={{
-            fontFamily:'var(--font-mono)', fontSize:'0.6rem', padding:'0.2rem 0.65rem',
+            fontFamily:'var(--font)', fontSize:'0.72rem', padding:'0.2rem 0.65rem',
             border:`1px solid ${color}30`, color:`${color}cc`, borderRadius:99,
             background:`${color}08`,
           }}>{t}</span>
@@ -596,7 +598,7 @@ function Milestone({ milestone, index, color, isLeft, revealRef }) {
       {/* Interactive element */}
       {milestone.interactive === 'ai_chat' && (
         <div style={{ marginTop:'2rem' }}>
-          <div style={{ fontFamily:'var(--font-mono)', fontSize:'0.65rem', color:`${color}77`, letterSpacing:'0.2em', marginBottom:'1rem' }}>
+          <div style={{ fontFamily:'var(--font)', fontSize:'0.76rem', color:`${color}77`, letterSpacing:'0.2em', marginBottom:'1rem' }}>
             // Try the spec assistant — type any feature request
           </div>
           <AiChatSim color={color} />
@@ -604,7 +606,7 @@ function Milestone({ milestone, index, color, isLeft, revealRef }) {
       )}
       {milestone.interactive === 'deploy_sim' && (
         <div style={{ marginTop:'2rem' }}>
-          <div style={{ fontFamily:'var(--font-mono)', fontSize:'0.65rem', color:`${color}77`, letterSpacing:'0.2em', marginBottom:'1rem' }}>
+          <div style={{ fontFamily:'var(--font)', fontSize:'0.76rem', color:`${color}77`, letterSpacing:'0.2em', marginBottom:'1rem' }}>
             // Simulate a zero-downtime Kamal deploy
           </div>
           <DeploySim color={color} />
@@ -612,7 +614,7 @@ function Milestone({ milestone, index, color, isLeft, revealRef }) {
       )}
       {milestone.interactive === 'cache_sim' && (
         <div style={{ marginTop:'2rem', display:'grid', gridTemplateColumns:'1fr', gap:'1rem' }}>
-          <div style={{ fontFamily:'var(--font-mono)', fontSize:'0.65rem', color:`${color}77`, letterSpacing:'0.2em' }}>
+          <div style={{ fontFamily:'var(--font)', fontSize:'0.76rem', color:`${color}77`, letterSpacing:'0.2em' }}>
             // Live edge cache simulator — try a lookup
           </div>
           <CacheSim color={color} />
@@ -694,7 +696,7 @@ export default function ProjectPage() {
     return (
       <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', gap:'1rem' }}>
         <div style={{ fontFamily:'var(--font-display)', color:'#00d4ff', fontSize:'1.5rem' }}>PROJECT NOT FOUND</div>
-        <Link to="/" style={{ fontFamily:'var(--font-mono)', color:'#8892b0', fontSize:'0.8rem' }}>← Back to portfolio</Link>
+        <Link to="/" style={{ fontFamily:'var(--font)', color:'#8892b0', fontSize:'0.92rem' }}>← Back to portfolio</Link>
       </div>
     );
   }
@@ -712,7 +714,7 @@ export default function ProjectPage() {
         justifyContent:'space-between',
       }}>
         <Link to="/" style={{
-          fontFamily:'var(--font-mono)', fontSize:'0.7rem', color:C.text2,
+          fontFamily:'var(--font)', fontSize:'0.82rem', color:C.text2,
           letterSpacing:'0.1em', textTransform:'uppercase', display:'flex', alignItems:'center', gap:'0.5rem',
           transition:'color 0.2s',
         }}
@@ -725,7 +727,7 @@ export default function ProjectPage() {
           {project.name}
         </div>
         <a href={project.orgUrl} target="_blank" rel="noopener noreferrer" style={{
-          fontFamily:'var(--font-mono)', fontSize:'0.68rem', letterSpacing:'0.12em',
+          fontFamily:'var(--font)', fontSize:'0.8rem', letterSpacing:'0.12em',
           padding:'0.35rem 0.85rem', border:`1px solid ${color}44`, color,
           borderRadius:3, transition:'all 0.2s', textTransform:'uppercase',
         }}
@@ -746,7 +748,7 @@ export default function ProjectPage() {
       }}>
         {/* Left: title + repos */}
         <div>
-          <div style={{ fontFamily:'var(--font-mono)', fontSize:'0.6rem', color:`${color}66`, letterSpacing:'0.3em', textTransform:'uppercase', marginBottom:'1rem' }}>
+          <div style={{ fontFamily:'var(--font)', fontSize:'0.72rem', color:`${color}66`, letterSpacing:'0.3em', textTransform:'uppercase', marginBottom:'1rem' }}>
             OPEN SOURCE PROJECT
           </div>
           <h1 style={{ fontFamily:'var(--font-display)', fontSize:'clamp(2.5rem,6vw,4.5rem)', fontWeight:900, color:'#fff', letterSpacing:'0.06em', lineHeight:1, marginBottom:'1rem', textShadow:`0 0 60px ${color}30` }}>
@@ -755,7 +757,7 @@ export default function ProjectPage() {
           <div style={{ fontFamily:'var(--font-heading)', fontSize:'clamp(0.9rem,2vw,1.1rem)', color, fontWeight:600, marginBottom:'1.5rem' }}>
             {project.tagline}
           </div>
-          <p style={{ fontFamily:'var(--font-mono)', fontSize:'0.8rem', color:C.text2, lineHeight:1.8, marginBottom:'2rem' }}>
+          <p style={{ fontFamily:'var(--font)', fontSize:'0.92rem', color:C.text2, lineHeight:1.8, marginBottom:'2rem' }}>
             {project.description}
           </p>
 
@@ -765,7 +767,7 @@ export default function ProjectPage() {
               <a key={r.name} href={r.url} target="_blank" rel="noopener noreferrer"
                 style={{
                   display:'flex', alignItems:'center', gap:'0.75rem',
-                  fontFamily:'var(--font-mono)', fontSize:'0.7rem',
+                  fontFamily:'var(--font)', fontSize:'0.82rem',
                   padding:'0.5rem 0.75rem', background:`${color}08`,
                   border:`1px solid ${color}22`, borderRadius:5,
                   transition:'all 0.2s', color:C.text2,
@@ -789,12 +791,12 @@ export default function ProjectPage() {
 
           {/* Stack bars */}
           <div style={{ background:C.card, border:`1px solid ${color}18`, borderRadius:8, padding:'1.25rem' }}>
-            <div style={{ fontFamily:'var(--font-mono)', fontSize:'0.6rem', color:`${color}66`, letterSpacing:'0.2em', marginBottom:'1rem' }}>// TECH STACK</div>
+            <div style={{ fontFamily:'var(--font)', fontSize:'0.72rem', color:`${color}66`, letterSpacing:'0.2em', marginBottom:'1rem' }}>Tech stack</div>
             {project.stack.map(({ label, pct }) => (
               <div key={label} style={{ marginBottom:'0.6rem' }}>
                 <div style={{ display:'flex', justifyContent:'space-between', marginBottom:'0.2rem' }}>
-                  <span style={{ fontFamily:'var(--font-mono)', fontSize:'0.65rem', color:C.text2 }}>{label}</span>
-                  <span style={{ fontFamily:'var(--font-mono)', fontSize:'0.6rem', color:`${color}88` }}>{pct}%</span>
+                  <span style={{ fontFamily:'var(--font)', fontSize:'0.76rem', color:C.text2 }}>{label}</span>
+                  <span style={{ fontFamily:'var(--font)', fontSize:'0.72rem', color:`${color}88` }}>{pct}%</span>
                 </div>
                 <div style={{ height:3, background:`${color}15`, borderRadius:99 }}>
                   <div style={{ height:'100%', width:`${pct}%`, background:`linear-gradient(90deg,${color},${color}88)`, borderRadius:99 }} />
@@ -811,7 +813,7 @@ export default function ProjectPage() {
           {project.stats.map(({ value, label }) => (
             <div key={label} style={{ padding:'1.25rem', background:C.card, border:`1px solid ${color}18`, borderRadius:8, textAlign:'center' }}>
               <div style={{ fontFamily:'var(--font-display)', fontSize:'1.8rem', fontWeight:900, color, lineHeight:1 }}>{value}</div>
-              <div style={{ fontFamily:'var(--font-mono)', fontSize:'0.6rem', color:C.text2, letterSpacing:'0.1em', textTransform:'uppercase', marginTop:'0.4rem' }}>{label}</div>
+              <div style={{ fontFamily:'var(--font)', fontSize:'0.72rem', color:C.text2, letterSpacing:'0.1em', textTransform:'uppercase', marginTop:'0.4rem' }}>{label}</div>
             </div>
           ))}
         </div>
@@ -821,7 +823,7 @@ export default function ProjectPage() {
       <div style={{ maxWidth:1100, margin:'0 auto', padding:'0 clamp(1rem,6vw,5rem)', marginBottom:'clamp(3rem,8vw,5rem)' }}>
         <div style={{ display:'flex', alignItems:'center', gap:'1rem' }}>
           <div style={{ flex:1, height:1, background:`linear-gradient(90deg,transparent,${color}44)` }} />
-          <div style={{ fontFamily:'var(--font-mono)', fontSize:'0.6rem', color:`${color}66`, letterSpacing:'0.25em', textTransform:'uppercase' }}>
+          <div style={{ fontFamily:'var(--font)', fontSize:'0.72rem', color:`${color}66`, letterSpacing:'0.25em', textTransform:'uppercase' }}>
             BUILD TIMELINE
           </div>
           <div style={{ flex:1, height:1, background:`linear-gradient(90deg,${color}44,transparent)` }} />
@@ -853,12 +855,12 @@ export default function ProjectPage() {
 
       {/* Footer */}
       <div style={{ textAlign:'center', padding:'clamp(3rem,8vw,6rem) 1rem' }}>
-        <div style={{ fontFamily:'var(--font-mono)', fontSize:'0.65rem', color:C.text3, marginBottom:'2rem', letterSpacing:'0.1em' }}>
+        <div style={{ fontFamily:'var(--font)', fontSize:'0.76rem', color:C.text3, marginBottom:'2rem', letterSpacing:'0.1em' }}>
           // {project.milestones.length} milestones · Open source · Built by Raymond Hughes
         </div>
         <div style={{ display:'flex', gap:'1rem', justifyContent:'center', flexWrap:'wrap' }}>
           <a href={project.orgUrl} target="_blank" rel="noopener noreferrer" style={{
-            fontFamily:'var(--font-mono)', fontSize:'0.72rem', letterSpacing:'0.12em',
+            fontFamily:'var(--font)', fontSize:'0.85rem', letterSpacing:'0.12em',
             padding:'0.75rem 2rem', background:`${color}18`, border:`1px solid ${color}44`,
             color, borderRadius:4, transition:'all 0.2s',
           }}
@@ -868,7 +870,7 @@ export default function ProjectPage() {
             View All Repos ↗
           </a>
           <Link to="/" style={{
-            fontFamily:'var(--font-mono)', fontSize:'0.72rem', letterSpacing:'0.12em',
+            fontFamily:'var(--font)', fontSize:'0.85rem', letterSpacing:'0.12em',
             padding:'0.75rem 2rem', background:'transparent', border:`1px solid ${C.text3}44`,
             color:C.text2, borderRadius:4, transition:'all 0.2s',
           }}

@@ -29,6 +29,11 @@ export default [
       ...react.configs['jsx-runtime'].rules,
       ...reactHooks.configs.recommended.rules,
       'react/jsx-no-target-blank': 'off',
+      // React 19 removed PropTypes from the react package and this project does
+      // not install the separate prop-types package, so the rule cannot be
+      // satisfied without adding a dependency nothing else here wants. Off, so
+      // the errors that remain are ones worth reading.
+      'react/prop-types': 'off',
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },
