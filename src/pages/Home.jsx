@@ -88,6 +88,24 @@ const SKILLS = [
 
 const PROJECTS = [
   {
+    org: 'Delphi',
+    // A single repository rather than an organisation, so the card shows the
+    // repository path instead of assuming github.com/<org>.
+    orgLabel: 'github.com/Ray-Hughes/delphi',
+    orgUrl: 'https://github.com/Ray-Hughes/delphi',
+    tagline: 'AI-Maintained Project Tracker & Knowledge Graph',
+    description:
+      'A desktop tracker where projects hold tasks, memory notes and links, with a knowledge graph underneath. Claude Code and GitHub Copilot read and write the same store over MCP, so what one agent works out survives into the next session. Shipped as installers for macOS and Windows with zero runtime dependencies, a deterministic entity graph, local embeddings, and an audit log that makes every change reversible.',
+    repos: [
+      { name: 'delphi', desc: 'Electron app, SQLite store, knowledge graph' },
+      { name: 'agent/mcp_server.js', desc: '11 MCP tools, JSON-RPC 2.0, no dependencies' },
+      { name: 'oracle.js', desc: 'Deterministic entity and edge extraction' },
+      { name: 'agent/guard.py', desc: 'PreToolUse hook denying destructive commands' },
+    ],
+    tags: ['MCP', 'Electron', 'SQLite', 'Knowledge Graph', 'Claude Code', 'Copilot', 'Local-First'],
+    color: '#4fd8e0',
+  },
+  {
     org: 'Patientevity',
     orgUrl: 'https://github.com/Patientevity',
     tagline: 'Healthcare & AI Tooling Platform',
@@ -699,7 +717,7 @@ function Projects() {
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
                   <div>
                     <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', letterSpacing: '0.2em', color: proj.color, textTransform: 'uppercase', marginBottom: '0.4rem', opacity: 0.7 }}>
-                      github.com/{proj.org}
+                      {proj.orgLabel || `github.com/${proj.org}`}
                     </div>
                     <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.1rem, 2.5vw, 1.3rem)', fontWeight: 700, color: '#fff', letterSpacing: '0.04em' }}>
                       {proj.org}

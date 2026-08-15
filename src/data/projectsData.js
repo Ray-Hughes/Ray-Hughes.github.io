@@ -1,4 +1,242 @@
 export const PROJECTS_MAP = {
+  delphi: {
+    id: 'delphi',
+    name: 'Delphi',
+    orgUrl: 'https://github.com/Ray-Hughes/delphi',
+    tagline: 'A Project Tracker Your AI Agents Keep Current',
+    color: '#4fd8e0',
+    colorDim: 'rgba(79,216,224,0.12)',
+    description: 'A desktop tracker where projects hold tasks, memory notes and links, and a knowledge graph sits underneath them. Claude Code and GitHub Copilot read and write the same store over MCP, so what one agent works out survives into the next session. Shipped as installers for macOS and Windows from a single tagged release, with zero runtime dependencies and an audit log that makes every change reversible.',
+    repos: [
+      { name: 'delphi', label: 'Electron app and MCP server', url: 'https://github.com/Ray-Hughes/delphi' },
+      { name: 'agent/mcp_server.js', label: 'JSON-RPC 2.0 over stdio', url: 'https://github.com/Ray-Hughes/delphi/blob/main/agent/mcp_server.js' },
+      { name: 'oracle.js', label: 'Knowledge graph extraction', url: 'https://github.com/Ray-Hughes/delphi/blob/main/oracle.js' },
+      { name: 'agent/guard.py', label: 'Destructive command guard', url: 'https://github.com/Ray-Hughes/delphi/blob/main/agent/guard.py' },
+    ],
+    stack: [
+      { label: 'Electron 43 + node:sqlite', pct: 92 },
+      { label: 'Model Context Protocol', pct: 95 },
+      { label: 'Knowledge Graph + Embeddings', pct: 85 },
+      { label: 'Ollama (local vectors)', pct: 78 },
+      { label: 'electron-builder (mac + win)', pct: 88 },
+      { label: 'GitHub Actions release pipeline', pct: 82 },
+    ],
+    stats: [
+      { value: '11', label: 'MCP Tools' },
+      { value: '0', label: 'Runtime Deps' },
+      { value: '2', label: 'Platforms Shipped' },
+      { value: '100%', label: 'Local Data' },
+    ],
+    diceFacts: [
+      'The MCP server has no dependencies at all. It is written against JSON-RPC 2.0 directly rather than through an SDK, so nothing can break it on an npm bump.',
+      'It prefers node:sqlite and falls back to the sqlite3 binary, because an editor launches it with whatever Node it happens to have, and Windows ships no sqlite3 command at all.',
+      'Graph extraction is deterministic rather than model driven. An invented node is worse than a missing one: a missing node returns less, a wrong node returns something false.',
+      'Every write records the row as it was, so undo replays stored state rather than being a second mechanism that can disagree with the first.',
+      'The menu bar icon is a simplified silhouette of the logo. The full mark is around forty strokes, and at sixteen pixels they average into a grey lump.',
+      'Unsigned macOS builds are still ad-hoc signed, because Apple Silicon refuses to start a binary carrying no signature at all, quarantine or not.',
+      'Backups run VACUUM INTO rather than copying the file, since recent rows can still be sitting in the write-ahead log and a plain copy loses them silently.',
+    ],
+    milestones: [
+      {
+        number: '01',
+        phase: 'PROBLEM',
+        title: 'Two Problems, One Tool',
+        subtitle: 'Flat lists stop working · Agents start from nothing',
+        description: 'Past about thirty items, a flat task list stops telling you which entries belong to the same piece of work. And every session an AI agent re-derives the same things: why an approach was rejected, which value was wrong last time. Those findings live in a chat log nobody reads again. Delphi makes the project the unit, and gives findings somewhere to live that is not a task pretending to be a note.',
+        screenshot: '/delphi/overview.png',
+        screenshotAlt: 'A Delphi project dashboard showing open, blocked and overdue counts alongside its linked repositories',
+        codeFile: 'schema.sql',
+        code: `-- A note is a thing you want to remember,
+-- not a thing you want to finish. Forcing
+-- them into one table is how task lists
+-- turn into junk drawers.
+
+CREATE TABLE IF NOT EXISTS notes (
+  id         INTEGER PRIMARY KEY,
+  project_id INTEGER REFERENCES projects(id)
+               ON DELETE CASCADE,
+  title      TEXT NOT NULL,
+  body       TEXT NOT NULL DEFAULT '',
+  kind       TEXT NOT NULL DEFAULT 'note'
+    CHECK (kind IN ('note', 'decision',
+      'gotcha', 'reference', 'contact')),
+  pinned     INTEGER NOT NULL DEFAULT 0
+);`,
+        tags: ['SQLite', 'Schema Design', 'Product Thinking'],
+      },
+      {
+        number: '02',
+        phase: 'THE STORE',
+        title: 'Every Change Reversible',
+        subtitle: 'Audit trail as the undo mechanism',
+        description: 'Every mutation records the row as it was before. Undo is not a second system that can drift out of step with the first: it replays the stored previous state. If a change is in the log it can be reversed, and if it cannot be reversed it is not in the log. Agents write through the same path, so an agent mistake is as recoverable as a human one.',
+        screenshot: null,
+        screenshotAlt: null,
+        codeFile: 'db.js',
+        code: `function undo(auditId) {
+  const entry = one(
+    "SELECT * FROM audit WHERE id = :id",
+    { id: auditId }
+  );
+  if (entry.undone) throw new Error(
+    "That change has already been undone");
+
+  const table  = TABLES[entry.entity];
+  const before = entry.before_json
+    ? JSON.parse(entry.before_json) : null;
+
+  if (entry.action === "create") {
+    run(\`DELETE FROM \${table}
+         WHERE id = :id\`,
+      { id: entry.entity_id });
+  } else if (entry.action === "update") {
+    const cols = Object.keys(before)
+      .filter((c) => c !== "id");
+    const sets = cols
+      .map((c) => \`\${c} = :\${c}\`).join(", ");
+    run(\`UPDATE \${table} SET \${sets}
+         WHERE id = :id\`,
+      { ...before, id: entry.entity_id });
+  }
+}`,
+        tags: ['Audit Log', 'Undo', 'Data Integrity'],
+      },
+      {
+        number: '03',
+        phase: 'THE ORACLE',
+        title: 'A Graph That Does Not Invent',
+        subtitle: 'Deterministic extraction · Local embeddings',
+        description: 'Notes and tasks are indexed as a graph of entities and the edges between them, so an agent can ask what connects to a thing rather than only what reads similarly to it. The payoff is multi-hop: a question about a database concern can return a ticket it never mentions, because both were discussed alongside the same pipeline. Extraction matches only shapes that cannot be mistaken for prose, plus a curated vocabulary. Embeddings run locally through Ollama and degrade to lexical search rather than disappearing.',
+        screenshot: null,
+        screenshotAlt: null,
+        codeFile: 'oracle.js',
+        code: `// Only shapes that cannot be mistaken
+// for prose. Add to the vocabulary rather
+// than loosening a pattern: a loose
+// pattern produces confident nonsense.
+
+const PATTERNS = [
+  { kind: "ticket",
+    re: /\\b([A-Z][A-Z0-9]{1,9}-\\d{2,6})\\b/g },
+  { kind: "file",
+    re: /\\b([\\w./-]+\\.(?:rb|js|py|ya?ml|
+         sql|sh|java|json|tf|md))\\b/g },
+];
+
+function extract(text) {
+  const found = new Map();
+  for (const { kind, re } of PATTERNS) {
+    re.lastIndex = 0;
+    let m;
+    while ((m = re.exec(text))) {
+      add(kind, m[1], m.index, m[0].length);
+    }
+  }
+  return [...found.values()];
+}`,
+        tags: ['Knowledge Graph', 'GraphRAG', 'Embeddings', 'Ollama'],
+      },
+      {
+        number: '04',
+        phase: 'AGENTS',
+        title: 'One Store, Many Agents',
+        subtitle: 'MCP over stdio · Zero dependencies',
+        description: 'Delphi ships an MCP server exposing eleven tools, so any agent that speaks the protocol can use it and several can share one store. They coordinate through shared state rather than messages: one writes a task, another picks it up, and both leave a trail attributed to their own actor name. The hard part was portability, since the server runs under whatever Node an editor launched it with.',
+        screenshot: '/delphi/memory.png',
+        screenshotAlt: 'The Memory tab showing a pinned gotcha and a decision note rendered as prose',
+        codeFile: 'agent/mcp_server.js',
+        code: `// node:sqlite where it exists: in process,
+// and the only route that works on Windows,
+// which ships no sqlite3 command. It landed
+// behind a flag in Node 22.5, so plenty of
+// versions throw here. That throw is the
+// whole test.
+
+function openDatabase() {
+  try {
+    const { DatabaseSync }
+      = require("node:sqlite");
+    const handle = new DatabaseSync(DB);
+    return {
+      kind: "node:sqlite",
+      query: (statement) =>
+        handle.prepare(statement).all(),
+    };
+  } catch {
+    const binary = findSqlite();
+    return { kind: binary,
+      query: (s) => viaBinary(binary, s) };
+  }
+}`,
+        tags: ['MCP', 'JSON-RPC 2.0', 'Claude Code', 'Copilot'],
+      },
+      {
+        number: '05',
+        phase: 'SAFETY',
+        title: 'A Guard for Agents Without Prompts',
+        subtitle: 'PreToolUse hook · Intent over spelling',
+        description: 'Running an agent with permission prompts disabled leaves nothing between a bad command and the disk. The guard is a PreToolUse hook that denies destructive commands and keeps working when prompts are off, because that is the case it exists for. It matches intent rather than exact spelling, so flags written separately or spaced oddly are still caught, and each command in a compound is judged on its own. Its limit is documented rather than hidden: it inspects text, so it stops accidents, not a determined agent.',
+        screenshot: null,
+        screenshotAlt: null,
+        codeFile: 'agent/guard.py',
+        code: `def has_recursive_force(cmd: str) -> bool:
+    """True for rm with both recursive and
+    force, however the flags are written."""
+    if not re.search(r"\\brm\\b", cmd):
+        return False
+    flags = "".join(
+        re.findall(r"\\s-([a-zA-Z]+)", cmd))
+    return ("r" in flags.lower()
+            and "f" in flags.lower())
+
+
+def check_segment(cmd: str):
+    """Judge one simple command. Returns a
+    refusal reason, or None to allow."""
+    c = norm(cmd)
+
+    if has_recursive_force(c):
+        for target in rm_targets(c):
+            clean = target.strip("\\"'")
+                          .rstrip("/")
+            if clean in PROTECTED_ROOTS:
+                return "refusing rm -rf on a
+                        protected path"`,
+        tags: ['Agent Safety', 'PreToolUse Hook', 'Python', 'CI Tested'],
+      },
+      {
+        number: '06',
+        phase: 'SHIPPING',
+        title: 'From Checkout to Installer',
+        subtitle: 'macOS + Windows · Signed pipeline · Landing page',
+        description: 'Packaging surfaced what were really latent bugs. The app wrote its database beside its own source, which is impossible inside a read-only bundle, so storage moved to per-user directories with a migration for existing installs. The MCP server needed a Windows path. A frameless window on Windows has no close button. Releases now build both platforms and publish only when both succeed, after an earlier release shipped without its Windows installer because two runners raced to create it.',
+        screenshot: null,
+        screenshotAlt: null,
+        codeFile: 'tools/after-pack.js',
+        code: `// Apple Silicon will not run an executable
+// with no signature at all. Not a warning,
+// not a prompt: the kernel refuses. Electron
+// arrives ad-hoc signed, but packaging
+// rewrites Info.plist and renames the binary,
+// and either invalidates it.
+
+exports.default = async function (context) {
+  if (context.electronPlatformName
+      !== "darwin") return;
+  if (process.env.CSC_LINK) return;
+
+  execFileSync("/usr/bin/codesign", [
+    "--force", "--deep",
+    "--sign", "-",
+    "--timestamp=none",
+    appPath,
+  ]);
+};`,
+        tags: ['electron-builder', 'Code Signing', 'GitHub Actions', 'Cross-platform'],
+      },
+    ],
+  },
+
   patientevity: {
     id: 'patientevity',
     name: 'Patientevity',
