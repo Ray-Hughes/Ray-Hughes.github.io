@@ -75,8 +75,8 @@ const FEATURED = {
   color: '#4fd8e0',
   repo: 'https://github.com/Ray-Hughes/delphi',
   site: 'https://ray-hughes.github.io/delphi/',
-  shot: '/delphi/overview.png',
-  icon: '/delphi/icon.png',
+  shot: '/shots/delphi-overview.png',
+  icon: '/shots/delphi-icon.png',
   blurb:
     'Projects hold tasks, memory notes and links, with a deterministic knowledge graph underneath. Claude Code and GitHub Copilot read and write the same store over MCP, so what one agent works out survives into the next session.',
   points: [
