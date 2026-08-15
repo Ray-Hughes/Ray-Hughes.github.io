@@ -216,12 +216,28 @@ function CareerGraph({ onPick }) {
         const dx = n.x - pointer.x;
         const dy = n.y - pointer.y;
         const d  = Math.hypot(dx, dy);
-        if (d < 150) {
+
+        // The scatter is the fun part, but applied to everything it made the
+        // project nodes impossible to click: they fled the cursor faster than it
+        // could arrive. So the three that do something are magnetic instead. They
+        // come to the pointer and hold still under it, which also says which
+        // nodes are worth reaching for.
+        if (n.project) {
+          if (d < 170 && d > 4) {
+            const pull = (1 - d / 170) ** 2 * 0.9;
+            n.vx -= (dx / d) * pull;
+            n.vy -= (dy / d) * pull;
+          }
+        } else if (d < 150) {
           const force = (1 - d / 150) ** 2 * 1.6;
           n.vx += (dx / (d || 1)) * force;
           n.vy += (dy / (d || 1)) * force;
         }
-        if (d < n.r + 22 && (!hover || d < hover.d)) hover = { node: n, d };
+
+        // A generous hit area on the clickable ones, because a 8px circle is a
+        // target you have to aim at rather than one you can just reach.
+        const reach = n.project ? n.r + 30 : n.r + 22;
+        if (d < reach && (!hover || d < hover.d)) hover = { node: n, d };
 
         n.vx *= 0.9; n.vy *= 0.9;
         n.x += n.vx; n.y += n.vy;
@@ -490,7 +506,7 @@ function Hero() {
               Available for AI engineering work
             </div>
 
-            <h1 className="display" style={{ fontSize: 'clamp(2.4rem, 5.6vw, 3.9rem)', animation: 'floatIn 0.7s 0.05s ease both' }}>
+            <h1 className="display" style={{ fontSize: 'clamp(2.2rem, 4.8vw, 3.35rem)', animation: 'floatIn 0.7s 0.05s ease both' }}>
               I build systems<br />that <span className="gradient-text">think with you</span>
             </h1>
 
@@ -522,7 +538,7 @@ function Hero() {
               position: 'absolute', bottom: 0, left: 0, right: 0, textAlign: 'center',
               fontSize: '0.76rem', color: 'var(--fg-3)', pointerEvents: 'none',
             }}>
-              Move through it. The three rings are projects, and they open.
+              Move your cursor through it. The three ringed nodes are projects, and they open.
             </div>
           </div>
         </div>
