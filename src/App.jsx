@@ -3,6 +3,7 @@ import { HashRouter, Routes, Route, Navigate, useLocation } from 'react-router-d
 import Home from './pages/Home';
 import ProjectPage from './pages/ProjectPage';
 import FDE from './pages/FDE';
+import SpaceField from './components/SpaceField';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -17,6 +18,7 @@ function ScrollToTop() {
 export default function App() {
   return (
     <HashRouter>
+      <SpaceField />
       <ScrollToTop />
       <Routes>
         <Route path="/" element={<Home />} />
