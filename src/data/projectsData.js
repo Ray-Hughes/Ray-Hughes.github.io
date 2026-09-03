@@ -141,7 +141,7 @@ function extract(text) {
         phase: 'AGENTS',
         title: 'One Store, Many Agents',
         subtitle: 'MCP over stdio · Zero dependencies',
-        description: 'Delphi ships an MCP server exposing eleven tools, so any agent that speaks the protocol can use it and several can share one store. They coordinate through shared state rather than messages: one writes a task, another picks it up, and both leave a trail attributed to their own actor name. The hard part was portability, since the server runs under whatever Node an editor launched it with.',
+        description: 'Delphi ships an MCP server exposing eighteen tools, so any agent that speaks the protocol can use it and several can share one store. They coordinate through shared state rather than messages: one writes a task, another picks it up, and both leave a trail attributed to their own actor name. The hard part was portability, since the server runs under whatever Node an editor launched it with.',
         screenshot: '/shots/delphi-memory.png',
         screenshotAlt: 'The Memory tab showing a pinned gotcha and a decision note rendered as prose',
         codeFile: 'agent/mcp_server.js',
