@@ -75,10 +75,10 @@ const PROOFS = [
     title: 'Delphi, taken from an itch to an installer',
     colour: '#4fd8e0',
     body: [
-      'A project tracker with a knowledge graph that AI agents keep current over MCP. Built because agents kept starting from nothing, shipped as signed installers for macOS and Windows from a tagged release, with documentation and a download page.',
+      'A project tracker with a knowledge graph that AI agents keep current over MCP. Built because agents kept starting from nothing, shipped as installers for macOS and Windows from a tagged release, with documentation and a download page. Version 1.6.0 gave every task a Sheet that agents and people write to through one attributed path, and a Workbench of its own whose rules are written so that work cannot be lost.',
       'It matters here because finishing is the rare part. Packaging surfaced a dozen problems that a prototype never would: read-only bundles, a database that had to move, a platform with no sqlite3, two CI runners racing to publish the same release. Field work is made of exactly those.',
     ],
-    points: ['11 MCP tools', 'Zero runtime dependencies', 'macOS and Windows', 'Anyone can install it today'],
+    points: ['43 MCP tools', 'One write path, attributed per agent', 'Never-lose-work rules', 'Bugs reproduced before fixed', 'Zero runtime dependencies', 'macOS and Windows', 'Anyone can install it today'],
     link: { to: '/projects/delphi', label: 'Read the full breakdown' },
   },
 ];

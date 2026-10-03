@@ -80,7 +80,10 @@ const FEATURED = {
   blurb:
     'Projects hold tasks, memory notes and links, with a deterministic knowledge graph underneath. Claude Code and GitHub Copilot read and write the same store over MCP, so what one agent works out survives into the next session.',
   points: [
-    ['11 MCP tools', 'Agents read and write the tracker directly, and every change is attributed to them'],
+    ['43 MCP tools', 'Agents read and write the tracker directly, and every change is attributed to them'],
+    ['One write path', 'The app, the command line and every agent go through one store, so History shows which agent did what'],
+    ['Rules that cannot lose work', 'A Workbench refuses to finish while anything is unpushed, and Discard keeps a copy for thirty days first'],
+    ['Reviewed adversarially', 'Bugs were reproduced before they were fixed, including a packaged server that had not started since 1.3.0'],
     ['Zero runtime dependencies', 'The MCP server speaks JSON-RPC 2.0 with no SDK to break on an npm bump'],
     ['Everything reversible', 'Each write stores the row as it was, so undo replays state rather than guessing'],
     ['Local by default', 'One SQLite file, embeddings through Ollama, nothing leaves the machine'],

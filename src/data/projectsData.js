@@ -22,7 +22,7 @@ export const PROJECTS_MAP = {
       { label: 'GitHub Actions release pipeline', pct: 82 },
     ],
     stats: [
-      { value: '11', label: 'MCP Tools' },
+      { value: '43', label: 'MCP Tools' },
       { value: '0', label: 'Runtime Deps' },
       { value: '2', label: 'Platforms Shipped' },
       { value: '100%', label: 'Local Data' },
@@ -141,7 +141,7 @@ function extract(text) {
         phase: 'AGENTS',
         title: 'One Store, Many Agents',
         subtitle: 'MCP over stdio · Zero dependencies',
-        description: 'Delphi ships an MCP server exposing eighteen tools, so any agent that speaks the protocol can use it and several can share one store. They coordinate through shared state rather than messages: one writes a task, another picks it up, and both leave a trail attributed to their own actor name. The hard part was portability, since the server runs under whatever Node an editor launched it with.',
+        description: 'Delphi ships an MCP server exposing forty-three tools, so any agent that speaks the protocol can use it and several can share one store. They coordinate through shared state rather than messages: one writes a task, another picks it up, and both leave a trail attributed to their own actor name. The hard part was portability, since the server runs under whatever Node an editor launched it with.',
         screenshot: '/shots/delphi-memory.png',
         screenshotAlt: 'The Memory tab showing a pinned gotcha and a decision note rendered as prose',
         codeFile: 'agent/mcp_server.js',
@@ -208,7 +208,7 @@ def check_segment(cmd: str):
         number: '06',
         phase: 'SHIPPING',
         title: 'From Checkout to Installer',
-        subtitle: 'macOS + Windows · Signed pipeline · Landing page',
+        subtitle: 'macOS + Windows · Ad-hoc signed builds · Landing page',
         description: 'Packaging surfaced what were really latent bugs. The app wrote its database beside its own source, which is impossible inside a read-only bundle, so storage moved to per-user directories with a migration for existing installs. The MCP server needed a Windows path. A frameless window on Windows has no close button. Releases now build both platforms and publish only when both succeed, after an earlier release shipped without its Windows installer because two runners raced to create it.',
         screenshot: null,
         screenshotAlt: null,
@@ -233,6 +233,34 @@ exports.default = async function (context) {
   ]);
 };`,
         tags: ['electron-builder', 'Code Signing', 'GitHub Actions', 'Cross-platform'],
+      },
+      {
+        number: '07',
+        phase: '1.6',
+        title: 'Sheets and Workbenches',
+        subtitle: 'A record per task · A folder per task · Nothing lost',
+        description: 'Every task gained a Sheet: what people and agents said, the commands they ran with their results, the questions asked and how they were decided. The parts that matter are promoted into a ledger, which is what the next agent reads first. The app, a new delphi command line and every agent write through one store, so each entry is attributed to whoever made it. Workbenches give each task its own folder and branch, so agents can work side by side in one repository. They run on rules written so work cannot be lost: Finish refuses while anything is unsaved or unpushed, and Discard keeps a copy of the whole folder in the repository for thirty days before removing anything. It was built by a team of agents against a written plan, with review gates that reproduced bugs before anything was fixed, including a packaged MCP server that had been unable to start since 1.3.0.',
+        screenshot: '/shots/delphi-workbenches.png',
+        screenshotAlt: "A project's Workbenches card listing five tasks, each with its branch and its state in words, such as 1 unsaved change, Missing, and behind main by 1",
+        codeFile: 'workbench/keep.js',
+        code: `// Before Discard removes anything, the folder
+// is committed onto a ref no branch points at.
+// This is what the person is told afterwards.
+
+function recoverText({ ref, repo, until,
+                       dir, name, notKept = [] }) {
+  const missing = notKept.map((n) => n.path || n);
+  const what = missing.length
+    ? \`Everything in it except \${missing...}
+       (not kept: too large or too many) is
+       kept until \${until} as \${ref}.\`
+    : \`Everything in it is kept until
+       \${until} as \${ref}.\`;
+  return \`\${what} To get it back: \` +
+    \`git -C \${q(repo)} worktree add
+     -b \${q(name)} \${q(dir)} \${ref}\`;
+}`,
+        tags: ['Git Worktrees', 'Data Safety', 'CLI', 'Agent Teams'],
       },
     ],
   },
