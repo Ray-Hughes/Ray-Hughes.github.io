@@ -40,4 +40,10 @@ export default [
       ],
     },
   },
+  {
+    // react-three-fiber elements take three.js props (position, args,
+    // castShadow…) that this rule only knows as unknown DOM attributes.
+    files: ['src/city/**', 'src/scenes/**', 'src/lab/**'],
+    rules: { 'react/no-unknown-property': 'off' },
+  },
 ]

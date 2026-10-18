@@ -1,70 +1,16 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import SpaceField from '../components/SpaceField';
+import { EXPERIENCE, SKILLS as SKILL_LIST } from '../data/profile';
+import { POSTS } from '../data/posts';
 
 /* ─────────────────────────────────────────────────────────────────────
    Data
 ───────────────────────────────────────────────────────────────────── */
 
-const EXPERIENCE = [
-  {
-    company: 'Take2 Consulting, LLC',
-    sub: 'U.S. Dept. of Veterans Affairs · Booz Allen Hamilton Partnership',
-    role: 'Solutions Architect / AI Engineer Lead',
-    period: 'Mar 2023 – Present',
-    current: true,
-    bullets: [
-      'Architect on the VA Appeals program — Caseflow, eFolder Express, Kafka appeals-consumer',
-      'Designed autonomous AI agents for test generation, documentation synthesis and PR review',
-      'Built the Appeals Agent Toolkit, a shared Copilot config layer standardising AI use across the team',
-      'Architected multi-product MCP integration so AI assistants operate with cross-system context',
-      'Pioneered anchor comment patterns and led a spec-driven development rollout from day one',
-    ],
-  },
-  {
-    company: 'Carepaths Inc.',
-    sub: null,
-    role: 'Senior Software Engineer',
-    period: 'May 2016 – Mar 2023',
-    current: false,
-    bullets: [
-      'Built and scaled a HIPAA-compliant behavioral health EHR serving thousands of clinicians',
-      'Delivered full FHIR and HL7 integration with QRDA and CDA import and export',
-      'Developed a cross-platform outcomes-tracking mobile app and an in-app fax service',
-      'Mentored engineers through coaching, code review and technical guidance',
-    ],
-  },
-  {
-    company: 'A1 Roof Trusses',
-    sub: null,
-    role: 'Software Engineer I',
-    period: 'Nov 2014 – Nov 2015',
-    current: false,
-    bullets: [
-      'Developed and maintained proprietary truss design software used in manufacturing',
-      'Managed connected device network infrastructure across the organisation',
-    ],
-  },
-  {
-    company: 'Cypress Communications Inc.',
-    sub: null,
-    role: 'Systems Engineer',
-    period: 'Oct 2006 – May 2013',
-    current: false,
-    bullets: [
-      'Installed and maintained commercial VoIP and cable systems for enterprise clients',
-      'Managed customer relationships and resolved technical escalations',
-    ],
-  },
-];
-
-const SKILLS = [
-  { cat: 'AI & Agents',    color: '#6ee7ff', items: ['LLM Integration', 'Agentic Pipelines', 'MCP', 'Claude Code', 'GitHub Copilot', 'RAG', 'Knowledge Graphs', 'Prompt Engineering', 'Spec-Driven Development'] },
-  { cat: 'Backend',        color: '#a78bfa', items: ['Ruby on Rails', 'Apache Kafka', 'SQS / Shoryuken', 'Event-Driven Architecture', 'REST APIs', 'PostgreSQL', 'SQLite'] },
-  { cat: 'Frontend',       color: '#4ade80', items: ['JavaScript', 'React', 'Electron', 'HTML / CSS'] },
-  { cat: 'Cloud & DevOps', color: '#fb923c', items: ['AWS (EC2, S3)', 'Docker', 'GitHub Actions', 'Dynatrace', 'New Relic', 'OpenTelemetry'] },
-  { cat: 'Healthcare',     color: '#4d9fff', items: ['HIPAA', 'HL7', 'FHIR', 'QRDA / CDA', 'VBMS Architecture'] },
-  { cat: 'Leadership',     color: '#f472b6', items: ['Technical Architecture', 'Team Mentorship', 'Agile / Scrum', 'Stakeholder Alignment'] },
-];
+// The skills' colours here are brighter than the city's, for the dark page.
+const TINT = { 'AI & Agents': '#6ee7ff', Backend: '#a78bfa', Frontend: '#4ade80', 'Cloud & DevOps': '#fb923c', Healthcare: '#4d9fff', Leadership: '#f472b6' };
+const SKILLS = SKILL_LIST.map((s) => ({ ...s, color: TINT[s.cat] || s.color }));
 
 // Delphi is the one anyone can run, so it is presented as a product rather than
 // as a card: the screenshot, what it does, and a button that downloads it.
@@ -415,7 +361,7 @@ const isWindows = () => typeof navigator !== 'undefined' && /Windows/i.test(navi
    Chrome
 ───────────────────────────────────────────────────────────────────── */
 
-const NAV = [['Work', 'work'], ['About', 'about'], ['Experience', 'experience'], ['Skills', 'skills'], ['Contact', 'contact']];
+const NAV = [['Work', 'work'], ['Writing', 'writing'], ['About', 'about'], ['Experience', 'experience'], ['Skills', 'skills'], ['Contact', 'contact']];
 
 function Nav() {
   const [solid, setSolid] = useState(false);
@@ -464,14 +410,14 @@ function Nav() {
               onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--fg-2)'; e.currentTarget.style.background = 'none'; }}
             >{label}</button>
           ))}
-          <Link to="/fde" style={{
+          <Link to="/?city" style={{
             padding: '0.5rem 0.85rem', borderRadius: 9,
             fontSize: '0.92rem', fontWeight: 700, color: 'var(--cy)',
             transition: 'background 0.2s',
           }}
             onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(110,231,255,0.1)'; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = 'none'; }}
-          >FDE</Link>
+          >3D City</Link>
           <a className="btn btn-ghost" href="/resume.pdf" download style={{ marginLeft: '0.5rem', padding: '0.6rem 1.1rem', fontSize: '0.88rem' }}>
             Resume
           </a>
@@ -534,9 +480,9 @@ function Hero() {
           alignItems: 'center',
         }} className="hero-grid">
           <div>
-            {/* The first thing anyone reads says what I am looking for, and it is
-                a door rather than a status line. */}
-            <Link to="/fde" style={{
+            {/* This is the plain version of the site; the first thing on it is the
+                way back into the city. */}
+            <Link to="/?city" style={{
               display: 'inline-flex', alignItems: 'center', gap: '0.55rem',
               padding: '0.4rem 0.9rem 0.4rem 0.8rem', borderRadius: 99,
               border: '1px solid var(--line-hi)', background: 'rgba(255,255,255,0.03)',
@@ -548,7 +494,7 @@ function Hero() {
               onMouseLeave={(e) => { e.currentTarget.style.color = 'var(--fg-2)'; e.currentTarget.style.borderColor = 'var(--line-hi)'; e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; }}
             >
               <span className="dot-live" style={{ width: 7, height: 7, borderRadius: 99, background: 'var(--cy)' }} />
-              Looking for Forward Deployed Engineer roles
+              Prefer to explore? Walk round the 3D city version
               <span style={{ color: 'var(--cy)' }}>→</span>
             </Link>
 
@@ -717,37 +663,28 @@ function Work() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 420px), 1fr))', gap: '1.5rem' }}>
           {PROJECTS.map((p) => <ProjectCard key={p.slug} p={p} />)}
         </div>
-        <FdeBand />
       </div>
     </section>
   );
 }
 
-/** The through line between the work above and the job I am after. */
-function FdeBand() {
+function Writing() {
   return (
-    <Link to="/fde" className="reveal panel spot" onMouseMove={spotlight}
-      style={{ display: 'block', marginTop: '1.5rem', padding: 'clamp(1.5rem, 4vw, 2.25rem)' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', gap: '1.5rem', alignItems: 'center' }} className="feature-grid">
-        <div>
-          <div className="eyebrow" style={{ color: 'var(--cy)', marginBottom: '0.6rem' }}>What I am looking for next</div>
-          <h3 style={{ fontSize: 'clamp(1.3rem, 2.8vw, 1.75rem)', marginBottom: '0.7rem' }}>
-            Forward Deployed Engineer
-          </h3>
-          <p style={{ color: 'var(--fg-2)', maxWidth: '62ch', marginBottom: '1rem' }}>
-            Three years embedded in a customer’s estate through Take2 and Booz Allen Hamilton,
-            two regulated domains learned properly, and tooling left behind that their own
-            engineers use. That is the job, under a different title.
-          </p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem' }}>
-            {['Embedded delivery', 'Domain immersion', 'Ambiguous problems', 'Ships and finishes'].map((c) => (
-              <span key={c} className="chip">{c}</span>
-            ))}
-          </div>
+    <section id="writing" className="section">
+      <div className="wrap">
+        <SectionHead eyebrow="Writing" title="Notes from building things" sub="Short write-ups on decisions that turned out to matter. In the city they are showing at the cinema." />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 320px), 1fr))', gap: '1rem' }}>
+          {POSTS.map((p) => (
+            <Link key={p.slug} to={`/blog/${p.slug}`} className="reveal panel spot" onMouseMove={spotlight} style={{ '--tint': p.color, display: 'block', padding: '1.4rem' }}>
+              <div style={{ fontSize: '1.6rem', marginBottom: '0.5rem' }} aria-hidden="true">{p.icon}</div>
+              <h3 style={{ fontSize: '1.15rem', marginBottom: '0.45rem' }}>{p.title}</h3>
+              <p style={{ color: 'var(--fg-2)', fontSize: '0.9rem' }}>{p.dek}</p>
+              <div style={{ color: p.color, fontWeight: 700, fontSize: '0.84rem', marginTop: '0.9rem' }}>{p.minutes} min read →</div>
+            </Link>
+          ))}
         </div>
-        <span className="btn btn-primary" style={{ pointerEvents: 'none' }}>Read the case →</span>
       </div>
-    </Link>
+    </section>
   );
 }
 
@@ -897,7 +834,7 @@ function Footer() {
     <footer style={{ borderTop: '1px solid var(--line)' }}>
       <div className="wrap" style={{ padding: '1.8rem 0', display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap', color: 'var(--fg-3)', fontSize: '0.85rem' }}>
         <span>Raymond Hughes · {new Date().getFullYear()}</span>
-        <span>Built with React and Vite. The graph is a canvas, not a library.</span>
+        <span>Built with React and Vite. The graph is a canvas; <Link to="/?city" style={{ color: 'var(--fg-2)', textDecoration: 'underline' }}>the city</Link> is three.js.</span>
       </div>
     </footer>
   );
@@ -912,10 +849,12 @@ export default function Home() {
 
   return (
     <>
+      <SpaceField />
       <Nav />
       <main>
         <Hero />
         <Work />
+        <Writing />
         <About />
         <Experience />
         <Skills />

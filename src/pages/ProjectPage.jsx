@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { PROJECTS_MAP } from '../data/projectsData';
 
@@ -146,7 +146,7 @@ function Dice({ facts, color }) {
   return (
     <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:'1.5rem', padding:'2rem', background: C.card, border:`1px solid ${color}22`, borderRadius:12 }}>
       <div style={{ fontFamily:'var(--font)', fontSize:'0.76rem', color:`${color}99`, letterSpacing:'0.25em', textTransform:'uppercase' }}>
-        // roll for a tech fact
+        {'// '}roll for a tech fact
       </div>
 
       {/* Dice scene */}
@@ -198,7 +198,6 @@ function Dice({ facts, color }) {
 }
 
 function faceStyle(n) {
-  const s = 30; // half size
   switch(n) {
     case 1: return { transform:'translateZ(30px)' };
     case 2: return { transform:'rotateX(90deg)  translateZ(30px)' };
@@ -539,7 +538,7 @@ function CodeBlock({ code, filename, color }) {
 }
 
 /* ── Milestone Card ───────────────────────────────────────────────── */
-function Milestone({ milestone, index, color, isLeft, revealRef }) {
+function Milestone({ milestone, color, isLeft, revealRef }) {
   const isMobile = useIsMobile();
   const visual = milestone.screenshot
     ? <img src={milestone.screenshot} alt={milestone.screenshotAlt}
@@ -599,7 +598,7 @@ function Milestone({ milestone, index, color, isLeft, revealRef }) {
       {milestone.interactive === 'ai_chat' && (
         <div style={{ marginTop:'2rem' }}>
           <div style={{ fontFamily:'var(--font)', fontSize:'0.76rem', color:`${color}77`, letterSpacing:'0.2em', marginBottom:'1rem' }}>
-            // Try the spec assistant — type any feature request
+            {'// '}Try the spec assistant — type any feature request
           </div>
           <AiChatSim color={color} />
         </div>
@@ -607,7 +606,7 @@ function Milestone({ milestone, index, color, isLeft, revealRef }) {
       {milestone.interactive === 'deploy_sim' && (
         <div style={{ marginTop:'2rem' }}>
           <div style={{ fontFamily:'var(--font)', fontSize:'0.76rem', color:`${color}77`, letterSpacing:'0.2em', marginBottom:'1rem' }}>
-            // Simulate a zero-downtime Kamal deploy
+            {'// '}Simulate a zero-downtime Kamal deploy
           </div>
           <DeploySim color={color} />
         </div>
@@ -615,7 +614,7 @@ function Milestone({ milestone, index, color, isLeft, revealRef }) {
       {milestone.interactive === 'cache_sim' && (
         <div style={{ marginTop:'2rem', display:'grid', gridTemplateColumns:'1fr', gap:'1rem' }}>
           <div style={{ fontFamily:'var(--font)', fontSize:'0.76rem', color:`${color}77`, letterSpacing:'0.2em' }}>
-            // Live edge cache simulator — try a lookup
+            {'// '}Live edge cache simulator — try a lookup
           </div>
           <CacheSim color={color} />
         </div>
@@ -654,7 +653,6 @@ export default function ProjectPage() {
   const revealRef            = useRevealRefs();
   const isMobile             = useIsMobile();
   const [activeMilestone, setActiveMilestone] = useState(0);
-  const milestoneRefs        = useRef([]);
 
   useLayoutEffect(() => {
     document.documentElement.style.scrollBehavior = 'auto';
@@ -701,7 +699,7 @@ export default function ProjectPage() {
     );
   }
 
-  const { color, colorDim } = project;
+  const { color } = project;
 
   return (
     <div style={{ background:C.bg, color:C.text, minHeight:'100vh', overflowX:'hidden' }}>
@@ -713,7 +711,7 @@ export default function ProjectPage() {
         display:'flex', alignItems:'center', padding:'0 clamp(1rem,4vw,3rem)',
         justifyContent:'space-between',
       }}>
-        <Link to="/" style={{
+        <Link to={`/projects/${slug}`} style={{
           fontFamily:'var(--font)', fontSize:'0.82rem', color:C.text2,
           letterSpacing:'0.1em', textTransform:'uppercase', display:'flex', alignItems:'center', gap:'0.5rem',
           transition:'color 0.2s',
@@ -721,7 +719,7 @@ export default function ProjectPage() {
         onMouseEnter={e => e.currentTarget.style.color = color}
         onMouseLeave={e => e.currentTarget.style.color = C.text2}
         >
-          ← Portfolio
+          ← Back inside
         </Link>
         <div style={{ fontFamily:'var(--font-display)', fontSize:'0.85rem', color, fontWeight:700, letterSpacing:'0.1em' }}>
           {project.name}
@@ -856,7 +854,7 @@ export default function ProjectPage() {
       {/* Footer */}
       <div style={{ textAlign:'center', padding:'clamp(3rem,8vw,6rem) 1rem' }}>
         <div style={{ fontFamily:'var(--font)', fontSize:'0.76rem', color:C.text3, marginBottom:'2rem', letterSpacing:'0.1em' }}>
-          // {project.milestones.length} milestones · Open source · Built by Raymond Hughes
+          {'// '}{project.milestones.length} milestones · Open source · Built by Raymond Hughes
         </div>
         <div style={{ display:'flex', gap:'1rem', justifyContent:'center', flexWrap:'wrap' }}>
           <a href={project.orgUrl} target="_blank" rel="noopener noreferrer" style={{
@@ -869,7 +867,7 @@ export default function ProjectPage() {
           >
             View All Repos ↗
           </a>
-          <Link to="/" style={{
+          <Link to={`/projects/${slug}`} style={{
             fontFamily:'var(--font)', fontSize:'0.85rem', letterSpacing:'0.12em',
             padding:'0.75rem 2rem', background:'transparent', border:`1px solid ${C.text3}44`,
             color:C.text2, borderRadius:4, transition:'all 0.2s',
@@ -877,7 +875,7 @@ export default function ProjectPage() {
           onMouseEnter={e => { e.currentTarget.style.borderColor=`${color}44`; e.currentTarget.style.color=color; e.currentTarget.style.transform='translateY(-2px)'; }}
           onMouseLeave={e => { e.currentTarget.style.borderColor=`${C.text3}44`; e.currentTarget.style.color=C.text2; e.currentTarget.style.transform=''; }}
           >
-            ← Back to Portfolio
+            ← Back to the building
           </Link>
         </div>
       </div>
