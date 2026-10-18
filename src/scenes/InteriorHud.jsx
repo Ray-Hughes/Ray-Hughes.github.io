@@ -8,7 +8,7 @@ import './interior.css';
 export function InteriorHud({ icon, title, sub, color, actions }) {
   return (
     <div className="in-hud" style={{ '--c': color }}>
-      <Link to="/?city" className="in-back" onPointerEnter={preloadCity} onFocus={preloadCity}>← Back to the city</Link>
+      <Link to="/" className="in-back" onPointerEnter={preloadCity} onFocus={preloadCity}>← Back to the city</Link>
       <div className="in-where">
         <span className="in-icon" aria-hidden="true">{icon}</span>
         <div>

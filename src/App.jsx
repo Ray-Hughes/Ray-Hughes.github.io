@@ -26,18 +26,11 @@ function canRunCity() {
 }
 
 /**
- * The front door. The city is the site, but a phone, a browser without
- * WebGL, or someone who asked for less motion gets the plain version, with
- * a way into the city from it. `/?city` always opens the city.
+ * The front door. The city is the site, on phones too; only a browser that
+ * cannot draw it at all gets the plain version instead.
  */
 function Front() {
-  const { search } = useLocation();
-  const asked = new URLSearchParams(search).has('city');
-  const small = window.matchMedia('(max-width: 720px)').matches;
-  const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (!canRunCity()) return <Home />;
-  if (!asked && (small || calm)) return <Home />;
-  return <City />;
+  return canRunCity() ? <City /> : <Home />;
 }
 
 function Loading() {

@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useProgress } from '@react-three/drei';
 import { PLACES, placeById } from './places';
 import { PROFILE } from '../data/profile';
@@ -60,10 +59,10 @@ export function TitleCard() {
 }
 
 export function Corner({ focus, onBack }) {
+  if (!focus) return null;
   return (
     <div className="hud-corner">
-      {focus && <button className="hud-btn" onClick={onBack}>← Back to the map</button>}
-      <Link className="hud-btn hud-btn-quiet" to="/classic">Skip the city</Link>
+      <button className="hud-btn" onClick={onBack}>← Back to the map</button>
     </div>
   );
 }

@@ -27,8 +27,19 @@ const unlimit = (c) => {
   c.minAzimuthAngle = -Infinity; c.maxAzimuthAngle = Infinity;
 };
 
-function Intro({ from, to, target, dur = 2.6, focus, limits }) {
-  const { camera, controls } = useThree();
+/**
+ * Rooms are framed for a landscape screen. A tall, narrow one sees much
+ * less of the room side to side, so the camera stands further back.
+ */
+const pullBack = (aspect) => (aspect < 1.35 ? Math.min(2.6, Math.pow(1.35 / aspect, 0.9)) : 1);
+const back = (p, target, k) => p.map((v, i) => target[i] + (v - target[i]) * k);
+
+function Intro({ from: from0, to: to0, target, dur = 2.6, focus, limits: limits0 }) {
+  const { camera, controls, size } = useThree();
+  const k = pullBack(size.width / Math.max(1, size.height));
+  const from = back(from0, target, k);
+  const to = back(to0, target, k);
+  const limits = { ...limits0, max: (limits0.max ?? 13) * k };
   const anim = useRef({ t: 0, done: false });
   const fly = useRef(null);
   useEffect(() => {

@@ -21,6 +21,10 @@ import { markCityLoaded } from './Hud';
 
 const SKY = '#a9dcff';
 
+// A phone gets fewer pixels and a smaller shadow map: the same town,
+// cheaper to draw on a small, warm GPU.
+const SMALL = typeof window !== 'undefined' && window.matchMedia('(max-width: 720px)').matches;
+
 function Sun() {
   const ref = useRef();
   return (
@@ -30,7 +34,7 @@ function Sun() {
       intensity={3.2}
       color="#fff0d8"
       castShadow
-      shadow-mapSize={[4096, 4096]}
+      shadow-mapSize={SMALL ? [2048, 2048] : [4096, 4096]}
       shadow-camera-left={-20}
       shadow-camera-right={20}
       shadow-camera-top={20}
@@ -65,7 +69,7 @@ export default function CityScene({ children }) {
   return (
     <Canvas
       shadows="soft"
-      dpr={[1, 1.75]}
+      dpr={SMALL ? [1, 1.25] : [1, 1.75]}
       camera={{ position: start.pos, fov: 30, near: 0.5, far: 300 }}
       gl={{ antialias: false, powerPreference: 'high-performance' }}
       onCreated={({ scene }) => { scene.background = new THREE.Color(SKY); scene.fog = new THREE.Fog(SKY, 55, 140); }}
@@ -102,7 +106,7 @@ export default function CityScene({ children }) {
       />
 
       <EffectComposer multisampling={0} enableNormalPass={false}>
-        <N8AO aoRadius={0.6} intensity={2.2} distanceFalloff={0.6} halfRes />
+        <N8AO aoRadius={0.6} intensity={2.2} distanceFalloff={0.6} halfRes quality={SMALL ? 'performance' : 'medium'} />
         <Bloom luminanceThreshold={1} intensity={0.6} mipmapBlur />
         <TiltShift2 blur={0.06} taper={0.75} start={[0.5, 0.0]} end={[0.5, 1.0]} />
         <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />

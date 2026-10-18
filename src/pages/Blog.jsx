@@ -114,8 +114,8 @@ export function BlogPost() {
   return (
     <div className="post-page">
       <nav className="post-nav">
-        <Link to="/blog">← Back to the cinema</Link>
-        <Link to="/">The city</Link>
+        <Link to="/blog">← All posts</Link>
+        <Link to="/">Home</Link>
       </nav>
       <article className="rw post-article"><Article post={post} /></article>
       <Link className="post-next" to={`/blog/${next.slug}`} style={{ '--c': next.color }}>
