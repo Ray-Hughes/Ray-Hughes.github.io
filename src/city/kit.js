@@ -78,6 +78,19 @@ export function rng(seed = 1) {
 const KEEP = ['position', 'normal', 'uv', 'color'];
 
 /**
+ * The models are meshopt-compressed, which stores positions and normals as
+ * small integers with a scale on the node. Transforming those in place
+ * writes floats into an integer array and wrecks them, so every attribute
+ * is unpacked to plain floats before it is baked.
+ */
+function toFloat(attr) {
+  const n = attr.count, size = attr.itemSize;
+  const out = new Float32Array(n * size);
+  for (let i = 0; i < n; i++) for (let c = 0; c < size; c++) out[i * size + c] = attr.getComponent(i, c);
+  return new THREE.BufferAttribute(out, size);
+}
+
+/**
  * Bakes many placed copies of a few models into one mesh per material.
  *
  * A city is hundreds of tiles, buildings and trees that never move. Drawn
@@ -117,7 +130,10 @@ export function bakeStatic(items, scenes) {
         : [{ mat: mats[0], range: null }];
 
       for (const { mat, range } of parts) {
-        let g = src.index ? src.toNonIndexed() : src.clone();
+        let g = new THREE.BufferGeometry();
+        for (const k of KEEP) if (src.attributes[k]) g.setAttribute(k, toFloat(src.attributes[k]));
+        if (src.index) g.setIndex(src.index.clone());
+        g = g.index ? g.toNonIndexed() : g;
         if (range) {
           const sub = new THREE.BufferGeometry();
           for (const k of Object.keys(g.attributes)) {
